@@ -9,11 +9,12 @@ import { connect } from 'react-redux';
 import { logOut } from '../actions/AuthedUsers'
  
 const NavBar = props => {
+  console.log('navv', props)
     return (
         <Navbar expand="lg" variant="light" bg="light">
           <Container>
             <Tabs
-                id="controlled-tab-example"
+                activeKey= {props.location.pathname}
                 onSelect={(k) => {
                   props.history.push(`${k}`)
                 }}

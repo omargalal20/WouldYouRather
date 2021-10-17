@@ -3,12 +3,14 @@ import NavBar from './NavBar';
 import SignInForm from './SignInView/SignIn';
 import { connect } from 'react-redux';
 import { Component } from 'react';
-import { BrowserRouter as Router, Route } from 'react-router-dom'
+import { Route, Switch, Redirect } from 'react-router-dom'
 import { handleInitialData } from '../actions';
 
 import Home from './HomeView/Home';
 import LeaderboardView from './LeaderboardView/LeaderboardView';
 import NewQuestion from './NewQuestionView/NewQuestion';
+import NotFound from './NotFound';
+import CardTemplate from './HomeView/CardTemplate';
 
 class App extends Component {
   componentDidMount() {
@@ -16,30 +18,39 @@ class App extends Component {
   }
   render() {
     return (
-          <Router>
+          <>
             <NavBar/>
             {
               this.props.loggedIn === false
               ? 
               <>
-              <Route path = '/'>
-                <SignInForm/>
-              </Route>
+              <SignInForm/>
               </> 
               :
               <>
-              <Route exact path = '/poll'>
+              <Switch>
+              <Route exact path="/">
+                <Redirect to="poll" />
+              </Route>
+              <Route  path = '/poll'>
                 <Home/>
               </Route>
-              <Route exact path = '/add'>
+              <Route  path = '/add'>
                 <NewQuestion/>
               </Route>
-              <Route exact path = '/leaderboard'>
+              <Route  path = '/leaderboard'>
                 <LeaderboardView/>
               </Route>
+              <Route path = '/questions/:qID'>
+                  <CardTemplate/>
+              </Route>
+              <Route path="/not-found">
+                  <NotFound />
+              </Route>
+              </Switch>
               </>
             }
-          </Router>
+          </>
     );
   }
 }

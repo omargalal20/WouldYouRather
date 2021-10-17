@@ -1,10 +1,10 @@
 import Card from 'react-bootstrap/Card'
 import Container from 'react-bootstrap/Container'
-import Button from 'react-bootstrap/Button'
 import CardTemplate from './CardTemplate'
-import { withRouter } from 'react-router-dom'
+import { withRouter, NavLink } from 'react-router-dom'
 import Tabs from 'react-bootstrap/Tabs'
 import Tab from 'react-bootstrap/Tab'
+import Button from "react-bootstrap/Button";
 
 import { connect } from 'react-redux'
 import { useState } from 'react'
@@ -31,39 +31,37 @@ const ViewQuestions = props => {
         <Card.Body>
             {
                 questions === 'UnansweredQuestions' ? 
-                (Object.keys(props.questions)
-                .filter(checkQuestion => !Object.keys(props.myInfo.answers).includes(checkQuestion))
+                (props.unAnsweredQuestions
                 .map(question => (
-                    <CardTemplate key = {question} question = { props.questions[question] }> 
+                    <CardTemplate key = {question.id} question = { question }> 
                         <Container className = 'text-left'>
                         <Card.Title>Would You Rather</Card.Title>
                         <Card.Subtitle className = "text-muted">
-                            {props.questions[question].optionOne.text}
+                            {question.optionOne.text}
                         </Card.Subtitle>
 
-                        <Button className = 'mt-3 w-100' variant="success" onClick = { () => {
-                          props.handleChoosePoll(question)
-                          props.history.push(`/questions/${question}`)
-                          } } >      
+                        <NavLink to={`/questions/${question.id}`}>
+                            <Button className = 'mt-3 w-100' variant="info">
                             View Poll
-                        </Button>
+                            </Button>
+                         </NavLink>
                         </Container>
                     </CardTemplate>
                 ))) :
-                (Object.keys(props.myInfo.answers)
+                (props.answeredQuestions
                 .map(question => (
-                    <CardTemplate key = {question} question = { props.questions[question] }>
+                    <CardTemplate key = {question.id} question = { question }>
                         <Container className = 'text-left'>
                         <Card.Title>Would You Rather</Card.Title>
                         <Card.Subtitle className = "text-muted">
-                            {props.questions[question].optionOne.text}
+                            {question.optionOne.text}
                         </Card.Subtitle>
-                          <Button className = 'mt-3 w-100' variant="success" onClick = { () => {
-                            props.handleChoosePoll(question)
-                            props.history.push(`/questions/${question}`)
-                            } } >      
-                              View Poll
-                          </Button>
+
+                          <NavLink to={`/questions/${question.id}`}>
+                            <Button className = 'mt-3 w-100' variant="info">
+                            View Poll
+                            </Button>
+                          </NavLink>
                         </Container>
                     </CardTemplate>
                 )))
@@ -73,16 +71,20 @@ const ViewQuestions = props => {
     )
 }
 
-// eslint-disable-next-line no-lone-blocks
-{/* <Button className = 'mt-3' variant = "outline-success" 
-onClick = { () => props.handleChoosePoll(question) }>
-  <NavLink to = {`/home/${question}`} style = {{color: 'white', textDecoration: 'none'}}>  
-      View Poll
-  </NavLink>
-</Button> */}
 
 function mapStateToProps ({ authedUser, users, questions }) {
-    return {
+  const answeredQuestions = Object.values(questions)
+  .filter((question) => Object.keys(users[authedUser].answers).includes(question.id)) 
+  .map((question) => Object.assign({}, question, { type: "answered" }))
+  .sort((a, b) => b.timestamp - a.timestamp); 
+
+const unAnsweredQuestions = Object.values(questions)
+  .filter((question) => !Object.keys(users[authedUser].answers).includes(question.id))
+  .map((question) => Object.assign({}, question, { type: "unanswered" }))
+  .sort((a, b) => b.timestamp - a.timestamp);
+return {
+    answeredQuestions,
+    unAnsweredQuestions,
       questions,
       myInfo: {...users[authedUser]},
       users: {...users}
