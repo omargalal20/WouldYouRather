@@ -15,8 +15,6 @@ const CardTemplate = props => {
     const [qid, setQid] = useState();
     const [answer, setAnswer] = useState();
 
-    console.log('carddd', props)
-
     const handleSubmit = () => {
         props.dispatch(handleAnswerQuestion(qid, answer))
     }
@@ -27,7 +25,7 @@ const CardTemplate = props => {
     return (
         <Card className ="m-auto mt-3" style={{ width: '40vw' }}>
         <Card.Header>
-            <Card.Title>{props.user.name} asks:</Card.Title>
+            <Card.Title>{props.didAnswer === true ? `Asked by ${props.user.name}`: `${props.user.name} asks`}</Card.Title>
         </Card.Header>
         <Card.Body className = 'd-flex'>
             <Container>
